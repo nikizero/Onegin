@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 FILE * open_file (const char * file);
 size_t size_file(FILE* file, int mode);
