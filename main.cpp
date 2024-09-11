@@ -14,7 +14,6 @@ int main()
 {
     const char *name_file = "onegin.txt";
     FILE* file= open_file(name_file);
-    printf("%zu \n", size_file(file, 1));
 
     fseek(file, 0, SEEK_SET);
 
@@ -24,8 +23,14 @@ int main()
         fclose(file);
         return 1; // Ошибка записи строк
     }
+    
+    int i = 0;
+    while (chars[1][i] != '\0')  //почему выводится весь файл а не i строчка, будто \0 нет в строке
+    {
+        printf("%c", chars[1][i]);
+        i++;
+    }
 
-    // printf("%c", chars[1][0]);
     fclose(file);
     free (*chars);
     free (chars);
@@ -89,22 +94,26 @@ size_t how_man_str (FILE* file)
 
 char** write_oneg(FILE * file)
 {
-    char * all_strings = (char *) calloc(size_file(file, 0) + 1, 1);
+    char * all_strings = (char *) calloc(size_file(file, 0), 1); //здесь хранятся все строки
     int num_of_char = 0;
     int num_of_string = 1;
-    char ** str_adr = (char **) calloc(size_file(file, 1), sizeof(char *));
+    char ** str_adr = (char **) calloc(size_file(file, 1), sizeof(char *)); //здесь хранятся указатели на начала строк
 
     *str_adr = all_strings;
-    printf("%d", num_of_char);
+    fseek(file, 0, SEEK_SET);
+
+    char * adr_of_char = all_strings + num_of_char;
 
     while(1)
     {
-        char * adr_of_char = all_strings + num_of_char;
-        printf("%d \n", num_of_char);
+        adr_of_char = all_strings + num_of_char;
         *(adr_of_char) = fgetc(file);
-        if (*(adr_of_char) == 0)
+        if (*(adr_of_char) == '\n')
         {
-            *(str_adr + num_of_string) = adr_of_char + 1;
+            adr_of_char ++;
+            *(adr_of_char) = '\0';
+            *(str_adr + num_of_string) = adr_of_char;
+            num_of_string++;
         }
         else if (*(adr_of_char) == EOF)
         {
