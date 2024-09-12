@@ -14,12 +14,11 @@ int main()
     FILE* file= open_file(name_file);
 
     fseek(file, 0, SEEK_SET);
-
     char** chars = write_oneg(file);
     if (chars == NULL) 
     {
         fclose(file);
-        return 1; // Ошибка записи строк
+        return 1; 
     }
     
     int i = 0;
@@ -28,6 +27,7 @@ int main()
         printf("%c", chars[1][i]);
         i++;
     }
+
 
     fclose(file);
     free (*chars);
@@ -48,6 +48,7 @@ FILE * open_file (const char * name_file)
 
 size_t size_file(FILE* file, int mode)
 {    
+    fseek(file, 0, SEEK_SET);
     int sys_file = fileno(file);
     if (sys_file == -1) 
     {
@@ -76,9 +77,10 @@ size_t size_file(FILE* file, int mode)
 
 size_t how_man_str (FILE* file)
 {
-{
     size_t i = 0;
     char buffer[100]; 
+
+    fseek(file, 0, SEEK_SET);
 
     while (fgets(buffer, sizeof(buffer), file))
     {
@@ -88,36 +90,41 @@ size_t how_man_str (FILE* file)
     return i + 1;
 }
 
-}
-
 char** write_oneg(FILE * file)
 {
-    char * all_strings = (char *) calloc(size_file(file, 0), 1); //здесь хранятся все строки
-    int num_of_char = 0;
-    int num_of_string = 1;
-    char ** str_adr = (char **) calloc(size_file(file, 1), sizeof(char *)); //здесь хранятся указатели на начала строк
+    char * all_chars = (char *) calloc(size_file(file, 0), 1); //здесь хранятся все символы
+    char ** str_adr = (char **) calloc(size_file(file, 1), sizeof(char *)); //Здесь хранятся указатели на начала строк
 
-    *str_adr = all_strings;
+    int num_of_char = -1;       //чтобы в цикле можно было увеличивать номер символа перед вводом (для системы и логики)
+    int num_of_str  = 0;
+
+
+    *str_adr = all_chars;       //записали адрес нулевой строки
     fseek(file, 0, SEEK_SET);
 
-    char * adr_of_char = all_strings + num_of_char;
+    char * adr_of_char = all_chars + num_of_char;  //абсолютный адрес символа для ввода
 
     while(1)
     {
-        adr_of_char = all_strings + num_of_char;
+        num_of_char++;
+        adr_of_char = all_chars + num_of_char;
         *(adr_of_char) = fgetc(file);
+
         if (*(adr_of_char) == '\n')
         {
-            adr_of_char ++;
+            num_of_char ++;
+            adr_of_char = all_chars + num_of_char;
+
             *(adr_of_char) = '\0';
-            *(str_adr + num_of_string) = adr_of_char;
-            num_of_string++;
+
+            num_of_str++;
+            *(str_adr + num_of_str) = adr_of_char + 1;
         }
+
         else if (*(adr_of_char) == EOF)
         {
             break;
         }
-        num_of_char++;
     }
     return str_adr;
 }
