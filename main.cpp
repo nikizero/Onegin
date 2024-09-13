@@ -2,11 +2,16 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <ctype.h>
+#include <string.h>
 
 FILE * open_file (const char * file);
 size_t size_file(FILE* file, int mode);
 size_t how_man_str (FILE* file);
 char** write_oneg(FILE * file);
+char * compare (char * a, char* b); 
+char* remove_punctuation(const char* input);
+int sort(char ** chars, FILE* file);
 
 int main()
 {
@@ -18,16 +23,15 @@ int main()
     if (chars == NULL) 
     {
         fclose(file);
-        return 1; 
+        return 1;
     }
     
-    int i = 0;
-    while (chars[1][i] != '\0')  //почему выводится весь файл а не i строчка, будто \0 нет в строке
-    {
-        printf("%c", chars[1][i]);
-        i++;
-    }
+    sort(chars, file);
 
+    for (int i = 0; i < size_file(file, 1); i++)
+    {
+        printf("%s", chars[i]);
+    }
 
     fclose(file);
     free (*chars);
@@ -128,4 +132,90 @@ char** write_oneg(FILE * file)
     }
     return str_adr;
 }
-// abcdefg/0afiakckok/0aslfoclo/0
+
+int sort(char ** chars, FILE* file)
+{
+    int i, j;
+    char* temp;
+    int n = size_file(file, 1);
+
+    for (i = 0; i < n - 1; i++) 
+    {
+        for (j = 0; j < n - i - 1; j++) 
+        {
+            if (compare(chars[j], chars[j + 1]) == chars[j + 1]) 
+            {
+                temp = chars[j];
+                chars[j] = chars[j+1];
+                chars[j + 1] = temp;
+            }
+        }
+    }
+    return 0;
+}
+char * compare (char * a, char* b)
+{
+    int i = 0;
+
+    char* buf_punkt_a = remove_punctuation(a);
+    char* buf_punkt_b = remove_punctuation(b);
+
+    while (1)
+    {
+        if ((int) *(buf_punkt_a + i) - (int) *(buf_punkt_b + i) < 0)
+        {
+            return a;
+        }
+
+        else if (*(buf_punkt_a + i) == *(buf_punkt_b + i))
+        {
+            i++;
+        }
+
+        else if (*(buf_punkt_a + i) == '\n')
+        {
+            if (*(buf_punkt_b + i) != '\n')
+            {
+                return a;
+            }
+        }
+
+        else
+        {
+            return b;
+        }
+    }
+}
+
+char* remove_punctuation(const char* input) 
+{
+    size_t len = strlen(input);
+    int j = 0; 
+    char* new_str = (char*) calloc(len + 1, sizeof(char));
+
+    if (new_str == NULL) 
+    {
+        perror("Ошибка выделения памяти");
+        return NULL;
+    }
+
+    for (int i = 0; i < len; i++) 
+    {
+        if (ispunct((unsigned char)input[i]) == 0) 
+        {
+            new_str[j++] = input[i];
+        }
+    }
+    new_str[j] = '\0';
+    len = strlen(new_str);
+
+    int i = 0;
+
+    while (i < len) 
+    {
+        *(new_str + i) = tolower((unsigned char) *(new_str + i));
+        i++;
+    }
+
+    return new_str;
+}
