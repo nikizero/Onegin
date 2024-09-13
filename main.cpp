@@ -9,7 +9,7 @@ FILE * open_file (const char * file);
 size_t size_file(FILE* file, int mode);
 size_t how_man_str (FILE* file);
 char** write_oneg(FILE * file);
-char * compare (char * a, char* b); 
+int compare (char * a, char* b); 
 char* remove_punctuation(const char* input);
 int sort(char ** chars, FILE* file);
 
@@ -143,7 +143,7 @@ int sort(char ** chars, FILE* file)
     {
         for (j = 0; j < n - i - 1; j++) 
         {
-            if (compare(chars[j], chars[j + 1]) == chars[j + 1]) 
+            if (compare(chars[j], chars[j + 1]) == -1) 
             {
                 temp = chars[j];
                 chars[j] = chars[j+1];
@@ -153,7 +153,8 @@ int sort(char ** chars, FILE* file)
     }
     return 0;
 }
-char * compare (char * a, char* b)
+
+int compare (char * a, char* b)
 {
     int i = 0;
 
@@ -164,7 +165,7 @@ char * compare (char * a, char* b)
     {
         if ((int) *(buf_punkt_a + i) - (int) *(buf_punkt_b + i) < 0)
         {
-            return a;
+            return -1;
         }
 
         else if (*(buf_punkt_a + i) == *(buf_punkt_b + i))
@@ -176,13 +177,17 @@ char * compare (char * a, char* b)
         {
             if (*(buf_punkt_b + i) != '\n')
             {
-                return a;
+                return -1;
+            }
+            else
+            {
+                return 0;   
             }
         }
 
         else
         {
-            return b;
+            return 1;
         }
     }
 }
