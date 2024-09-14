@@ -5,20 +5,40 @@
 #include <ctype.h>
 #include <string.h>
 
-FILE * open_file (const char * file);
+FILE * open_file(const char * file);
 size_t size_file(FILE* file, int mode);
-size_t how_man_str (FILE* file);
+size_t how_man_str(FILE* file);
 char** write_oneg(FILE * file);
 char * compare (char * a, char* b); 
 char* remove_punctuation(const char* input);
 int sort(char ** chars, FILE* file);
 
-int main()
+// fread 
+// fwrite
+
+// struct String {
+//  char* str;
+//  size_t len;
+// }
+
+// открыли файл и узнали размер
+// выделили динамически buffer на размер файла // buffer = str\nstr2\n
+// берем и меняем \n на \0 и считаем колво \n // buffer = str\0str2\0
+// выделил память char** adr = calloc (size = колво \n)
+// while не \0 -> просто i++, как только встретили записали указатель на следующий элемент
+// два компаратора, слева направо и справа налево
+// две сортировки свои и стандартный qsort (начать с него)
+
+// добавить в папку data сортируемые файлы и выходной файл
+
+// ПОТОМ:
+// еще нужно структуру добавить, которая хранит char* и ее длину (5 пункт)
+
+int main() 
 {
     const char *name_file = "onegin.txt";
-    FILE* file= open_file(name_file);
+    FILE *file = open_file(name_file);
 
-    fseek(file, 0, SEEK_SET);
     char** chars = write_oneg(file);
     if (chars == NULL) 
     {
@@ -28,18 +48,18 @@ int main()
     
     sort(chars, file);
 
-    for (int i = 0; i < size_file(file, 1); i++)
+    for (int i = 0; i < size_file(file, 1); i++) // вынести size_file
     {
         printf("%s", chars[i]);
     }
 
     fclose(file);
-    free (*chars);
-    free (chars);
+    free(*chars);
+    free(chars);
     return 0;
 }
 
-FILE * open_file (const char * name_file)
+FILE * open_file(const char *name_file) // норм
 {
     FILE *file = fopen(name_file, "r");
     if (file == NULL) 
@@ -96,8 +116,8 @@ size_t how_man_str (FILE* file)
 
 char** write_oneg(FILE * file)
 {
-    char * all_chars = (char *) calloc(size_file(file, 0), 1); //здесь хранятся все символы
-    char ** str_adr = (char **) calloc(size_file(file, 1), sizeof(char *)); //Здесь хранятся указатели на начала строк
+    char *all_chars = (char *)  calloc(size_file(file, 0), 1); //здесь хранятся все символы
+    char **str_adr  = (char **) calloc(size_file(file, 1), sizeof(char *)); //Здесь хранятся указатели на начала строк
 
     int num_of_char = -1;       //чтобы в цикле можно было увеличивать номер символа перед вводом (для системы и логики)
     int num_of_str  = 0;
@@ -106,7 +126,7 @@ char** write_oneg(FILE * file)
     *str_adr = all_chars;       //записали адрес нулевой строки
     fseek(file, 0, SEEK_SET);
 
-    char * adr_of_char = all_chars + num_of_char;  //абсолютный адрес символа для ввода
+    char *adr_of_char = all_chars + num_of_char;  //абсолютный адрес символа для ввода
 
     while(1)
     {
@@ -153,12 +173,15 @@ int sort(char ** chars, FILE* file)
     }
     return 0;
 }
+
 char * compare (char * a, char* b)
 {
     int i = 0;
 
     char* buf_punkt_a = remove_punctuation(a);
     char* buf_punkt_b = remove_punctuation(b);
+
+    // if isalpha
 
     while (1)
     {
@@ -206,6 +229,7 @@ char* remove_punctuation(const char* input)
             new_str[j++] = input[i];
         }
     }
+
     new_str[j] = '\0';
     len = strlen(new_str);
 
