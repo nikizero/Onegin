@@ -1,5 +1,5 @@
-#include "file_proc.cpp"
-#include "sorting.cpp"
+#include "sorting.h"
+#include "file_proc.h"
 
 // fread 
 // fwrite
@@ -9,10 +9,11 @@
 //  size_t len;
 // }
 
-// открыли файл и узнали размер                                        +
-// выделили динамически buffer на размер файла // buffer = str\nstr2\n +
-// берем и меняем \n на \0 и считаем колво \n // buffer = str\0str2\0  +
-// выделил память char** adr = calloc (size = колво \n)                +
+//TODO
+// открыли файл и узнали размер                                                            +
+// выделили динамически buffer на размер файла // buffer = str\nstr2\n                     +
+// берем и меняем \n на \0 и считаем колво \n // buffer = str\0str2\0                      +
+// выделил память char** adr = calloc (size = колво \n)                                    +
 // while не \0 -> просто i++, как только встретили записали указатель на следующий элемент +
 
 // два компаратора, слева направо и справа налево
