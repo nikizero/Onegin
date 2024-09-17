@@ -6,13 +6,13 @@ void bubble_sort(void **arr, int n, size_t el_size, int (*compare)(const void** 
     {
         for (int j = 0; j < n - i - 1; j++) 
         {
-            if (compare((const char**)arr + j * el_size, (const char**)arr + (j + 1) * el_size) >= 0) 
+            if (compare((const void **)((const char**)arr + j * el_size), (const void **)(const char**)arr + (j + 1) * el_size) >= 0) 
             {
-                char *temp = (char *) arr[j];
+                void *temp = arr[j];
                 arr[j] = arr[j + 1];
                 arr[j + 1] = temp;
             }
-        }
+        }ю/
     }
 }
 
@@ -20,7 +20,7 @@ void bubble_sort(void **arr, int n, size_t el_size, int (*compare)(const void** 
 int compare (const void** a_in, const void** b_in)
 {
     int i = 0;
-    char * a = *(char**) a;
+    char * a  = *(char**) a;
     char *  b = *(char**) b;
 
     char* buf_punkt_a = remove_punctuation(a);
