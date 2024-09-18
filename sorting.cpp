@@ -1,30 +1,31 @@
 #include "sorting.h"
 
-void bubble_sort(void **arr, int n, size_t el_size, int (*compare)(const void** a_in, const void** b_in)) 
+void bubble_sort(void **arr, int n, size_t el_size, int (*compare)(const void* a_in, const void* b_in)) 
 {
     for (int i = 0; i < n - 1; i++) 
     {
         for (int j = 0; j < n - i - 1; j++) 
         {
-            if (compare((const void **)((const char**)arr + j * el_size), (const void **)(const char**)arr + (j + 1) * el_size) >= 0) 
+            if (compare(&arr[j], &arr[j + 1]) > 0) 
             {
                 void *temp = arr[j];
                 arr[j] = arr[j + 1];
                 arr[j + 1] = temp;
             }
-        }ю/
+        }
     }
 }
 
 
-int compare (const void** a_in, const void** b_in)
+int compare (const void* a_in, const void* b_in)
 {
     int i = 0;
-    char * a  = *(char**) a;
-    char *  b = *(char**) b;
+    const char *str_a = *(const char **)a_in;
+    const char *str_b = *(const char **)b_in;
 
-    char* buf_punkt_a = remove_punctuation(a);
-    char* buf_punkt_b = remove_punctuation(b);
+    char *buf_punkt_a = remove_punctuation(str_a);
+    char *buf_punkt_b = remove_punctuation(str_b);
+
 
     while (1)
     {

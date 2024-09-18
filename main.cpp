@@ -38,7 +38,7 @@ int main()
     }
     
     printf("%s \n", chars[0]);
-    bubble_sort((void **)chars, hms, sizeof(char*), compare);
+    bubble_sort((void **)chars, hms, sizeof(void*), compare);
     printf("%s \n", chars[0]);
 
     fclose(file);
