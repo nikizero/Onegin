@@ -1,30 +1,15 @@
 #include "file_proc.h"
-
-size_t how_man_str (char *all_chars)
-{
-    int how_man_str = 1;
-    for (int i = 0; all_chars[i] != EOF; i++)
-    {
-        if ((int) all_chars[i] == '\n' || all_chars[i] == EOF)
-        {
-            all_chars[i] = '\0';
-            how_man_str++;
-        }
-    }
-    return how_man_str;
-}
-
-size_t how_man_chars (FILE* file)
-{
-    return size_file(file, 0)/sizeof(char);
-}
+#include "util.h"
 
 char** write_oneg(FILE * file, int* hms)
 {
-    int num_of_str  = 0;
-    char *all_chars = (char *)  calloc(size_file(file, 0) + 2, 1); //здесь хранятся все символы
+    assert(hms);
+    assert(file);
 
-    size_t bytesRead = fread(all_chars, 1, size_file(file, 1), file);
+    int num_of_str  = 0;
+    char *all_chars = (char *)  calloc(size_file(file) + 1, 1); //здесь хранятся все символы
+
+    size_t bytesRead = fread(all_chars, 1, size_file(file), file);
 
     all_chars[bytesRead] = EOF;
 
@@ -34,7 +19,6 @@ char** write_oneg(FILE * file, int* hms)
     
     *(str_adr) = all_chars;
     num_of_str++;
-
     for (int i = 0; all_chars[i] != EOF; i++)
     {
         if (all_chars[i] == '\0')
@@ -46,43 +30,67 @@ char** write_oneg(FILE * file, int* hms)
     return str_adr;
 }
 
-size_t size_file(FILE* file, int mode)
+size_t size_file(FILE* file)
 {    
+    assert(file);
+
     fseek(file, 0, SEEK_SET);
     int sys_file = fileno(file);
     if (sys_file == -1) 
     {
         perror("Ошибка открытия файла 2!\n");
-        return 0;
+        return 1;
     }
 
-    struct stat st;                                    //st инициализруется при запуске функции на следущей строке
+    struct stat st = {};                                  
     if (fstat(sys_file, &st) == -1) 
     {
         perror("Ошибка получения информации о файле");
         close(sys_file); 
-        return 0;
+        return 1;
     }
 
-    if (mode == 0)
-    {
-        return st.st_size;
-    }
-
-    else if (mode == 1)
-    {
-        return how_man_chars (file);
-    }
-    return 0;
+    return st.st_size;
+    
 }
 
-FILE * open_file(const char *name_file) // норм
+FILE * open_file(const char *name_file, const char* mode) // норм
 {
-    FILE *file = fopen(name_file, "r");
+    assert(name_file);
+    assert(mode);
+    
+    FILE *file = fopen(name_file, mode);
     if (file == NULL) 
     {
         perror("Ошибка открытия файла 1!\n");
         return 0;
-    }
+    } 
     return file;
+}
+
+char** run_write_file(FILE* file, int* hms)
+{
+    assert(hms);
+    assert(file);
+    
+    char** chars = write_oneg(file, hms);
+    if (chars == NULL) 
+    {
+        fclose(file);
+        return NULL;
+    }
+    return chars;
+}
+
+// void save (char** chars, FILE* file)
+// {
+//     fwrite(chars, sizeof(char), size_file(file), file);
+// }
+
+void save(char** chars, FILE* file, int hms)
+{
+    for (int i = 0; i < hms; i++)
+    {
+        fprintf(file, "%s\n", chars[i]);
+    }
 }

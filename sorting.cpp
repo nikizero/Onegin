@@ -1,24 +1,44 @@
 #include "sorting.h"
 
-void bubble_sort(void **arr, int n, size_t el_size, int (*compare)(const void* a_in, const void* b_in)) 
+void bubble_sort(void *arr, size_t n, size_t el_size, compare_t compare) 
 {
-    for (int i = 0; i < n - 1; i++) 
+    assert(arr);
+
+    for (size_t i = 0; i < n - 1; i++) 
     {
-        for (int j = 0; j < n - i - 1; j++) 
+        for (size_t j = 0; j < n - i - 1; j++) 
         {
-            if (compare(&arr[j], &arr[j + 1]) > 0) 
+            if (compare((char*)arr + j*el_size, (char*)arr + (j + 1)*el_size) > 0) 
             {
-                void *temp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = temp;
+                void *temp = calloc(el_size, 1);
+
+                if (temp == NULL) 
+                {
+                    perror("Ошибка выделения памяти");
+                    break;
+                }
+
+                memcpy(temp, (char*)arr + j*el_size, el_size);
+                memcpy((char*)arr + j*el_size, (char*)arr + (j + 1)*el_size, el_size);
+                memcpy((char*)arr + (j + 1)*el_size, temp, el_size);
+                free(temp);
             }
         }
     }
 }
 
+void sort(void *arr, size_t n, size_t el_size, compare_t compare, sorting_t sorting)
+{
+    assert(arr);
+
+    sorting(arr, n, el_size, compare);
+} 
 
 int compare (const void* a_in, const void* b_in)
 {
+    assert(a_in);
+    assert(b_in);
+
     int i = 0;
     const char *str_a = *(const char **)a_in;
     const char *str_b = *(const char **)b_in;
@@ -59,8 +79,56 @@ int compare (const void* a_in, const void* b_in)
     }
 }
 
+int compare_from_end (const void* a_in, const void* b_in)
+{
+    assert(a_in);
+    assert(b_in);
+
+    const char *str_a = *(const char **)a_in;
+    const char *str_b = *(const char **)b_in;
+
+    char *buf_punkt_a = remove_punctuation(str_a);
+    char *buf_punkt_b = remove_punctuation(str_b);
+    int i = strlen(buf_punkt_a) - 1;
+    int j = strlen(buf_punkt_b) - 1;
+
+
+    while (1)
+    {
+        if ((int) *(buf_punkt_a + i) - (int) *(buf_punkt_b + j) < 0)
+        {
+            return -1;
+        }
+
+        else if (*(buf_punkt_a + i) == *(buf_punkt_b + i))
+        {
+            i--;
+            j--;
+        }
+
+        else if (i == 0)
+        {
+            if (j==0)
+            {
+                return 0;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        else
+        {
+            return 1;
+        }
+    }
+}
+
 char* remove_punctuation(const char* input) 
 {
+    assert(input);
+
     size_t len = strlen(input);
     int j = 0; 
     char* new_str = (char*) calloc(len + 1, sizeof(char));

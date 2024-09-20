@@ -5,11 +5,13 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <assert.h>
 
-FILE *open_file(const char *file);
-size_t size_file(FILE* file, int mode);
-size_t how_man_chars(FILE* file);
-size_t how_man_str(char *all_chars);
+FILE *open_file(const char *file, const char * mode);
+size_t size_file(FILE* file);
+char** run_write_file(FILE* file, int* hms);
 char** write_oneg(FILE *file, int* hms);
+void save(char** chars, FILE* file, int hms);
 
-#endif // FILE_PROC_H
+
+#endif 
